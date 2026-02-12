@@ -1,0 +1,310 @@
+<div class="users-container">
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="header-title">
+          <span class="title-accent">Team</span> Directory
+        </h1>
+        <p class="header-subtitle">
+          Discover and connect with our talented professionals
+        </p>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <svg
+            class="search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput(searchQuery)"
+            placeholder="Search by User ID..."
+            class="search-input"
+          />
+          <button
+            *ngIf="searchQuery"
+            (click)="clearSearch()"
+            class="clear-search"
+            aria-label="Clear search"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <div *ngIf="isSearching" class="search-spinner">
+            <div class="spinner-icon"></div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="searchResult && !isSearching"
+          class="search-result-dropdown"
+        >
+          <div
+            class="search-result-item"
+            (click)="navigateToUser(searchResult.id)"
+          >
+            <img
+              [src]="searchResult.avatar"
+              [alt]="searchResult.first_name"
+              class="result-avatar"
+            />
+            <div class="result-info">
+              <div class="result-name">
+                {{ searchResult.first_name }} {{ searchResult.last_name }}
+              </div>
+              <div class="result-email">{{ searchResult.email }}</div>
+            </div>
+            <svg
+              class="result-arrow"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div
+          *ngIf="searchError && !isSearching && searchQuery"
+          class="search-error-dropdown"
+        >
+          <div class="search-error-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ searchError }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-decoration">
+        <div class="decoration-circle"></div>
+        <div class="decoration-circle"></div>
+        <div class="decoration-circle"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="users-content">
+    <!-- Loading Skeleton -->
+    <div *ngIf="loading$ | async" class="loading-container">
+      <div class="users-grid">
+        <div
+          class="user-card skeleton-card"
+          *ngFor="let item of [1, 2, 3, 4, 5, 6]"
+        >
+          <div class="card-header-skeleton">
+            <div class="skeleton-avatar"></div>
+          </div>
+          <div class="card-content-skeleton">
+            <div class="skeleton-line skeleton-line-lg"></div>
+            <div class="skeleton-line skeleton-line-md"></div>
+            <div class="skeleton-line skeleton-line-sm"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Grid - No error check needed, errors shown via toast -->
+    <div *ngIf="!(loading$ | async) && users.length > 0" class="users-grid">
+      <div
+        class="user-card"
+        *ngFor="let user of users; let i = index"
+        [style.animation-delay.ms]="i * 100"
+        (click)="navigateToUser(user.id)"
+      >
+        <div class="card-background"></div>
+        <div class="card-content-wrapper">
+          <div class="user-avatar">
+            <img
+              [src]="user.avatar"
+              [alt]="user.first_name + ' ' + user.last_name"
+            />
+            <div class="avatar-ring"></div>
+          </div>
+          <div class="user-info">
+            <h3 class="user-name">
+              {{ user.first_name }} {{ user.last_name }}
+            </h3>
+            <p class="user-email">{{ user.email }}</p>
+            <p class="user-id">ID: #{{ user.id }}</p>
+          </div>
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <button
+              (click)="getUserById(user.id)"
+              class="btn-action btn-view"
+              title="View Details"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              View
+            </button>
+          </div>
+          <div class="card-hover-effect"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State (when no users and not loading) -->
+    <div *ngIf="!(loading$ | async) && users.length === 0" class="empty-state">
+      <div class="empty-state-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <h3 class="empty-state-title">No Users Found</h3>
+      <p class="empty-state-message">
+        There are currently no users to display.
+      </p>
+    </div>
+
+    <!-- Pagination Info Bar -->
+    <div
+      *ngIf="users.length > 0 && !(loading$ | async)"
+      class="pagination-info-bar"
+    >
+      <div class="info-content">
+        <span class="info-badge"
+          >Page {{ currentPage }} of {{ totalPages }}</span
+        >
+        <span class="info-text"
+          >Showing {{ perPage }} of {{ total }} members</span
+        >
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div
+      *ngIf="totalPages > 1 && !(loading$ | async)"
+      class="pagination-container"
+    >
+      <div class="pagination-controls">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="btn-page btn-prev"
+          [class.disabled]="currentPage === 1"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+
+        <div class="page-numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            (click)="goToPage(page)"
+            [class.active]="currentPage === page"
+            [class.ellipsis]="page === -1"
+            [disabled]="page === -1"
+            class="btn-page-num"
+          >
+            {{ page === -1 ? "..." : page }}
+          </button>
+        </div>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="btn-page btn-next"
+          [class.disabled]="currentPage === totalPages"
+        >
+          Next
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

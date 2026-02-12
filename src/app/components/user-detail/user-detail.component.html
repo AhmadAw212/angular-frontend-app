@@ -1,0 +1,204 @@
+<div class="user-detail-container">
+  <!-- Header with Search and Back Button -->
+  <header class="detail-header">
+    <div class="header-content">
+      <button (click)="goBack()" class="btn-back">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Back to Directory
+      </button>
+
+      <div class="header-title">
+        <h1>User Profile</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading$ | async" class="loading-container">
+    <div class="detail-card skeleton-detail">
+      <div class="skeleton-header">
+        <div class="skeleton-avatar-large"></div>
+      </div>
+      <div class="skeleton-content">
+        <div class="skeleton-line skeleton-line-xl"></div>
+        <div class="skeleton-line skeleton-line-lg"></div>
+        <div class="skeleton-line skeleton-line-md"></div>
+        <div class="skeleton-line skeleton-line-lg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !(loading$ | async)" class="error-container">
+    <div class="error-card">
+      <div class="error-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      </div>
+      <h3 class="error-title">User Not Found</h3>
+      <p class="error-message">{{ error }}</p>
+      <div class="error-actions">
+        <button (click)="retry()" class="btn-retry">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"
+            />
+          </svg>
+          Try Again
+        </button>
+        <button (click)="goBack()" class="btn-back-error">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Back to Directory
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Details -->
+  <div *ngIf="user && !(loading$ | async)" class="detail-content">
+    <div class="detail-card">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="profile-background"></div>
+        <div class="profile-avatar-container">
+          <div class="profile-avatar">
+            <img
+              [src]="user.avatar"
+              [alt]="user.first_name + ' ' + user.last_name"
+            />
+            <div class="avatar-glow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Content -->
+      <div class="profile-content">
+        <div class="profile-name">
+          <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+          <span class="user-badge">ID: #{{ user.id }}</span>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                ></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <div class="info-details">
+              <label>Email Address</label>
+              <p>{{ user.email }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="info-details">
+              <label>First Name</label>
+              <p>{{ user.first_name }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="info-details">
+              <label>Last Name</label>
+              <p>{{ user.last_name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
