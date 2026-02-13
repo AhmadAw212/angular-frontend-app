@@ -130,7 +130,6 @@
   </header>
 
   <div class="users-content">
-    <!-- Loading Skeleton -->
     <div *ngIf="loading$ | async" class="loading-container">
       <div class="users-grid">
         <div
@@ -149,7 +148,6 @@
       </div>
     </div>
 
-    <!-- Users Grid - No error check needed, errors shown via toast -->
     <div *ngIf="!(loading$ | async) && users.length > 0" class="users-grid">
       <div
         class="user-card"
@@ -201,7 +199,6 @@
       </div>
     </div>
 
-    <!-- Empty State (when no users and not loading) -->
     <div *ngIf="!(loading$ | async) && users.length === 0" class="empty-state">
       <div class="empty-state-icon">
         <svg
